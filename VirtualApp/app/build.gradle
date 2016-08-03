@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-
+apply plugin: com.lody.manifest.ManifestProcessorPlugin
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
@@ -33,6 +33,9 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+}
+va_conf {
+    stub_count = 10
 }
 
 dependencies {
