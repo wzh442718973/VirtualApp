@@ -33,9 +33,15 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+    productFlavors {
+        umeng {}
+//        wandoujai {}
+//        yingyongbao {}
+    }
 }
+
 va_conf {
-    stub_count = 10
+    stub_count = 88
 }
 
 dependencies {

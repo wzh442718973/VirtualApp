@@ -1,6 +1,3 @@
-/*
- * Copyright (C) 2016 Baidu, Inc. All Rights Reserved.
- */
 package com.lody.manifest
 
 import org.apache.commons.io.FileUtils
@@ -92,18 +89,32 @@ public class ManifestProcessorPlugin implements Plugin<Project> {
         try {
             vaConfig = ManifestExtension.getConfig(project);
         } catch (Exception ex) {
-            ex.printStackTrace()
             vaConfig = new ManifestExtension()
         }
-        project.tasks.whenTaskAdded {
-            task ->
-                if (task.name.startsWith("process") && task.name.endsWith("Manifest")) {
-                    task.doLast {
-                        final def task1 = task;
-                        parseDocument(task1.manifestOutputFile)
+
+        def variants = project.android.applicationVariants;
+
+        variants.all {
+            variant ->
+                String outputDirName = variant.dirName
+
+                def task = project.tasks.findByName("process${variant.name.capitalize()}Manifest")
+
+                task.doLast {
+                    parseDocument(task.manifestOutputFile)
+                }
+                def checkManifestTask = project.tasks.findByName("check${variant.name.capitalize()}Manifest")
+                checkManifestTask.doLast {
+
+                    def file = project.file(
+                            "$project.buildDir/intermediates/manifests/full/" +
+                                    "${outputDirName}/AndroidManifest.xml")
+                    if (file.exists()) {
+                        file.delete()
                     }
                 }
         }
+
     }
 
     void parseDocument(final File xmlFile) {
@@ -111,7 +122,6 @@ public class ManifestProcessorPlugin implements Plugin<Project> {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Reader reader = getUtfReader(xmlFile);
             InputSource is = new InputSource(reader);
-//            factory.setNamespaceAware(true);
             factory.setValidating(false);
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(is);
@@ -132,6 +142,9 @@ public class ManifestProcessorPlugin implements Plugin<Project> {
             }
 
             int stubCount = vaConfig.stub_count;
+
+            println("===========Inject Manifest ${stubCount}========")
+
 
             for (int i = 0; i < stubCount; i++) {
                 Node fragmentNode = builder.parse(
