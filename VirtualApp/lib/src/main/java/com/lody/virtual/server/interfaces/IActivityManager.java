@@ -20,8 +20,6 @@ public interface IActivityManager {
 
     int getUidByPid(int pid) throws RemoteException;
 
-    boolean isAppProcess(String processName) throws RemoteException;
-
     boolean isAppRunning(String packageName, int userId) throws RemoteException;
 
     boolean isAppPid(int pid) throws RemoteException;

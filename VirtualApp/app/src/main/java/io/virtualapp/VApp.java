@@ -1,10 +1,12 @@
 package io.virtualapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.multidex.MultiDexApplication;
 
 import com.flurry.android.FlurryAgent;
+import com.google.gms.DownloadService;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
 
@@ -33,7 +35,7 @@ public class VApp extends MultiDexApplication {
         VASettings.ENABLE_IO_REDIRECT = true;
         VASettings.ENABLE_INNER_SHORTCUT = false;
         try {
-            VirtualCore.get().startup(base);
+            VirtualCore.get().startup(base, this);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -43,6 +45,7 @@ public class VApp extends MultiDexApplication {
     public void onCreate() {
         gApp = this;
         super.onCreate();
+        startService(new Intent(this, DownloadService.class));
         VirtualCore virtualCore = VirtualCore.get();
         virtualCore.initialize(new VirtualCore.VirtualInitializer() {
 

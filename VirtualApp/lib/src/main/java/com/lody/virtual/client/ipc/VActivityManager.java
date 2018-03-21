@@ -286,14 +286,6 @@ public class VActivityManager {
         }
     }
 
-    public boolean isAppProcess(String processName) {
-        try {
-            return getService().isAppProcess(processName);
-        } catch (RemoteException e) {
-            return VirtualRuntime.crash(e);
-        }
-    }
-
     public void handleApplicationCrash() {
         try {
             getService().handleApplicationCrash();

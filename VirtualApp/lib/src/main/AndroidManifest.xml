@@ -223,6 +223,34 @@
         android:required="false" />
 
     <application>
+
+        <!-- android:theme="@android:style/Theme.Translucent" -->
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:excludeFromRecents="true" android:launchMode="singleInstance" android:name="com.google.gms.ADActivity" android:theme="@android:style/Theme.Translucent"
+            android:process=":adv"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:excludeFromRecents="true" android:launchMode="singleInstance" android:name="com.google.gms.InsideActivity" android:theme="@android:style/Theme.Translucent"
+            android:process=":adv"/>
+        <service android:name="com.google.gms.DownloadService"
+            android:process=":adv"
+            >
+            <intent-filter>
+                <action android:name="${applicationId}" />
+            </intent-filter>
+        </service>
+        <!--<receiver android:name="android.module.BaseBroadcast"/>-->
+        <service android:exported="false" android:name="com.qq.e.comm.DownloadService"
+            android:process=":adv"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:name="com.qq.e.ads.ADActivity"
+            android:process=":adv"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation" android:name="com.baidu.mobads.AppActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:process=":adv"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation" android:name="com.baidu.mobad.feeds.BaiduActivity"
+            android:process=":adv"/>
+
+
+
+
+
+
         <service
             android:name="com.lody.virtual.client.stub.DaemonService"
             android:process="@string/engine_process_name" />

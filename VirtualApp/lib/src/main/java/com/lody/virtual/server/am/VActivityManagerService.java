@@ -646,7 +646,7 @@ public class VActivityManagerService implements IActivityManager {
                 ApplicationInfo appInfo = VPackageManagerService.get().getApplicationInfo(packageName, 0, userId);
                 appInfo.flags |= ApplicationInfo.FLAG_HAS_CODE;
                 String stubProcessName = getProcessName(callingPid);
-                int vpid = parseVPid(stubProcessName);
+                int vpid = VirtualCore.parseVPid(stubProcessName);
                 if (vpid != -1) {
                     performStartProcessLocked(uid, vpid, appInfo, processName);
                 }
@@ -654,17 +654,6 @@ public class VActivityManagerService implements IActivityManager {
         }
     }
 
-    private int parseVPid(String stubProcessName) {
-        String prefix = VirtualCore.get().getHostPkg() + ":p";
-        if (stubProcessName != null && stubProcessName.startsWith(prefix)) {
-            try {
-                return Integer.parseInt(stubProcessName.substring(prefix.length()));
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-        }
-        return -1;
-    }
 
 
     private String getProcessName(int pid) {
@@ -832,11 +821,6 @@ public class VActivityManagerService implements IActivityManager {
             return vpid;
         }
         return -1;
-    }
-
-    @Override
-    public boolean isAppProcess(String processName) {
-        return parseVPid(processName) != -1;
     }
 
     @Override

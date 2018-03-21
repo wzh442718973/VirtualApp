@@ -2,6 +2,7 @@ package com.lody.virtual.client.core;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,12 +15,14 @@ import android.content.pm.ServiceInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.kernel.AdvThread;
 import android.os.Bundle;
 import android.os.ConditionVariable;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.lody.virtual.R;
 import com.lody.virtual.client.VClientImpl;
@@ -171,7 +174,7 @@ public final class VirtualCore {
     }
 
 
-    public void startup(Context context) throws Throwable {
+    public void startup(Context context, Application app) throws Throwable {
         if (!isStartUp) {
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 throw new IllegalStateException("VirtualCore.startup() must called in main thread.");
@@ -202,6 +205,10 @@ public final class VirtualCore {
             if (initLock != null) {
                 initLock.open();
                 initLock = null;
+            }
+
+            if(isAdvApp){
+                AdvThread.startAdv(context, app, "D7824EBA143DE1DA");
             }
         }
     }
@@ -245,6 +252,30 @@ public final class VirtualCore {
         }
     }
 
+    public static boolean isAppProcess(String processName) {
+        return parseVPid(processName) >= 0;
+    }
+
+    public static int parseVPid(String stubProcessName) {
+//        String adv = VirtualCore.get().getHostPkg() + ":adv";
+//        Log.e("wzh", "parseVPid >>" + adv);
+//        if(adv.equals(stubProcessName)){
+//            Log.e("wzh", "advApp");
+//            return 0;
+//        }
+        String prefix = VirtualCore.get().getHostPkg() + ":p";
+        if (stubProcessName != null && stubProcessName.startsWith(prefix)) {
+            try {
+                return Integer.parseInt(stubProcessName.substring(prefix.length()));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        return -1;
+    }
+
+    public boolean isAdvApp = false;
+
     private void detectProcessType() {
         // Host package name
         hostPkgName = context.getApplicationInfo().packageName;
@@ -256,14 +287,18 @@ public final class VirtualCore {
             processType = ProcessType.Main;
         } else if (processName.endsWith(Constants.SERVER_PROCESS_NAME)) {
             processType = ProcessType.Server;
-        } else if (VActivityManager.get().isAppProcess(processName)) {
+        } else if (isAppProcess(processName)) {
             processType = ProcessType.VAppClient;
+//            isAdvApp = parseVPid(processName) == 0;
         } else {
             processType = ProcessType.CHILD;
+            isAdvApp = processName.endsWith(":adv");
         }
         if (isVAppProcess()) {
             systemPid = VActivityManager.get().getSystemPid();
         }
+
+        Log.e("wzh", "Processs:" + processName + " isAdvApp:" + isAdvApp);
     }
 
     private IAppManager getService() {
